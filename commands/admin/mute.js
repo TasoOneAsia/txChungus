@@ -21,12 +21,15 @@ module.exports = {
             return message.reply(`You're not allowed to use this command.`);
         }
 
-        const mention = message.mentions.members.first();
-        if (!mention) return message.reply('You have to mention one user');
+        const mentionedMember = message.mentions.members.first();
+        if (!mentionedMember) return message.reply('You have to mention one user');
         if (typeof args[0] === 'undefined') return message.reply('Please use the correct command format. `!mute @mention 1w/1d/1h/1m reason`');
-        if (mention.user.id === message.author.id) return message.reply('u brainlet...'); //user trying to mute himself
-        if (mention.user.id === message.client.user.id) return message.reply('yo, really?'); //user trying to mute chungus
+        if (mentionedMember.user.id === message.author.id) return message.reply('u brainlet...'); //user trying to mute himself
+        if (mentionedMember.user.id === message.client.user.id) return message.reply('yo, really?'); //user trying to mute chungus
 
+        const isMaintainer = mentionedMember.roles.cache.has(config.maintainerRole);
+
+        if (isMaintainer) return message.reply('🤔 thats not very nice :(');
         //Parsing time
         const parsedTime = parseTime(args[0]);
         if (!parsedTime) return message.reply('Invalid time');
@@ -34,14 +37,14 @@ module.exports = {
         const expiration = Date.now() + parsedTime;
 
         try {
-            await GlobalActions.tempRoleAdd('muted', mention.user.id, expiration, reason);
-            message.reply(`Muted \`${mention.displayName}\` for \`${args[0]}\`\nReason: \`${reason}\``);
-            log(`${message.author.tag} muted \`${mention.displayName}\` for \`${args[0]}\` and reason: \`${reason}\``);
+            await GlobalActions.tempRoleAdd('muted', mentionedMember.user.id, expiration, reason);
+            message.reply(`Muted \`${mentionedMember.displayName}\` for \`${args[0]}\`\nReason: \`${reason}\``);
+            log(`${message.author.tag} muted \`${mentionedMember.displayName}\` for \`${args[0]}\` and reason: \`${reason}\``);
         } catch (error) {
             message.reply('Something terrible just happened, fuck. Most likely the member left.');
             dir(error)
         }
 
-        mention.send(`You have been muted for \`${args[0]}\`\nReason: \`${reason}\``).catch(()=>{});
+        mentionedMember.send(`You have been muted for \`${args[0]}\`\nReason: \`${reason}\``).catch(()=>{});
     }
 };

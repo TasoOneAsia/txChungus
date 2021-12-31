@@ -9,12 +9,20 @@ For FiveM server and resources use <#766868150590505011> and <#76686836304104658
 
 module.exports = {
     description: 'Directs a person to a help channel',
+    /**
+     */
     async execute(message, args, config) {
         //If no mention - just print message
         if (!message.mentions.users.size) {
             return message.channel.send(defaultMessage);
         }
         const mentionString = message.mentions.users.map(x => `<@${x.id}>`).join(' ');
+
+        const hasTargetMaintainer = message.mentions.members.some(member => member.roles.cache.has(config.maintainerRole));
+
+        if (hasTargetMaintainer) {
+            return await message.channel.send(`🤨 Seems a little bit odd to chan a maintainer 🤔`);
+        }
 
         //If directed channel
         if(Object.keys(config.supportChannels).includes(args[0])){
@@ -23,7 +31,6 @@ module.exports = {
         }else{
             await message.channel.send(`${mentionString} ${defaultMessage}`);
         }
-
         //If admin and on general
         if (message.txIsAdmin && message.channel.id === config.channels.general) {
             message.mentions.users.forEach(async (user) => {

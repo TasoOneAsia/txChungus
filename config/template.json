@@ -3,7 +3,7 @@
     "guild": "111111111111111111",
     "prefix": "!",
     "txStatsPath": "./data/metadata.json",
-
+    "maintainerRole": "111111111111111111",
     "channels": {
         "general": "111111111111111111",
         "showYourWork": "111111111111111111",
